@@ -40,7 +40,7 @@ class TaskList extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         //context.read<TaskBloc>().add(DeleteTask(task.id!));
-                        context.read<TaskBloc>().add(DeleteTask(task));
+                        context.read<TaskBloc>().add(DeleteTask(task.id!));
                         Navigator.of(context).pop();
                       },
                       child: const Text('Delete'),

@@ -5,19 +5,29 @@ import '../bloc/task_bloc.dart';
 import '../widgets/task_list.dart';
 import 'add_edit_task_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Smart Todo List'),
-        actions: [
-          // Add filter and search icons here
-        ],
-      ),
-      body: BlocBuilder<TaskBloc, TaskState>(
+      appBar: _buildAppBar(),
+      body: BlocConsumer<TaskBloc, TaskState>(
+        listener: (context, state) {
+          if (state is TasksError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            );
+          }
+        },
         builder: (context, state) {
           if (state is TasksLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -41,15 +51,12 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.inbox, size: 80, color: Colors.grey),
-                  Text('No tasks yet!', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                  Text('No tasks found!', style: TextStyle(fontSize: 18, color: Colors.grey)),
                 ],
               ),
             );
           }
-          if (state is TasksError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-          return const Center(child: Text('Something went wrong.'));
+          return const Center(child: Text('Add a task to get started!'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -60,6 +67,59 @@ class HomeScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: _isSearching
+          ? TextField(
+        controller: _searchController,
+        autofocus: true,
+        decoration: const InputDecoration(
+          hintText: 'Search tasks...',
+          border: InputBorder.none,
+        ),
+        onChanged: (query) {
+          context.read<TaskBloc>().add(SearchTasks(query));
+        },
+      )
+          : const Text('Smart Todo List'),
+      actions: [
+        IconButton(
+          icon: Icon(_isSearching ? Icons.close : Icons.search),
+          onPressed: () {
+            setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) {
+                _searchController.clear();
+                context.read<TaskBloc>().add(const SearchTasks(''));
+              }
+            });
+          },
+        ),
+        PopupMenuButton<TaskFilter>(
+          onSelected: (filter) {
+            context.read<TaskBloc>().add(FilterTasks(filter));
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: TaskFilter.all, child: Text('All')),
+            const PopupMenuItem(value: TaskFilter.pending, child: Text('Pending')),
+            const PopupMenuItem(value: TaskFilter.completed, child: Text('Completed')),
+          ],
+          icon: const Icon(Icons.filter_list),
+        ),
+        PopupMenuButton<TaskSort>(
+          onSelected: (sort) {
+            context.read<TaskBloc>().add(SortTasks(sort));
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: TaskSort.byDate, child: Text('Sort by Date')),
+            const PopupMenuItem(value: TaskSort.byPriority, child: Text('Sort by Priority')),
+          ],
+          icon: const Icon(Icons.sort),
+        ),
+      ],
     );
   }
 }
