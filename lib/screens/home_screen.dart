@@ -21,7 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: BlocConsumer<TaskBloc, TaskState>(
+        //In BlocConsumer you can use both listener and builder
         listener: (context, state) {
+          print("Inside listener $state");
           if (state is TasksError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
@@ -29,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         builder: (context, state) {
+          print("builder is called");
           if (state is TasksLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -81,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
           border: InputBorder.none,
         ),
         onChanged: (query) {
+          print(query);
           context.read<TaskBloc>().add(SearchTasks(query));
         },
       )

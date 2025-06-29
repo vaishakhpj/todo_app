@@ -16,6 +16,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
 
   TaskBloc(this._databaseHelper) : super(TasksInitial()) {
+    //The given function will be executed when the event is emitted.
     on<LoadTasks>(_onLoadTasks);
     on<AddTask>(_onAddTask);
     on<UpdateTask>(_onUpdateTask);
@@ -24,6 +25,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<FilterTasks>(_onFilterTasks);
     on<SearchTasks>(_onSearchTasks);
     on<SortTasks>(_onSortTasks);
+
+    add(LoadTasks());
   }
 
   void _onLoadTasks(LoadTasks event, Emitter<TaskState> emit) async {
@@ -81,6 +84,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   void _onSearchTasks(SearchTasks event, Emitter<TaskState> emit) {
     _currentQuery = event.query;
     _applyFiltersAndSort(emit);
+    //_applySearching(emit);
   }
 
   void _onSortTasks(SortTasks event, Emitter<TaskState> emit) {
@@ -98,6 +102,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       filteredTasks = filteredTasks.where((task) => task.isCompleted).toList();
     }
 
+    print("current query at bloc $_currentQuery");
     // Searching
     if (_currentQuery.isNotEmpty) {
       filteredTasks = filteredTasks
@@ -117,10 +122,30 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     if (filteredTasks.isEmpty) {
       emit(TasksEmpty());
     } else {
+      print("emitting filtered tasks");
       emit(TasksLoaded(filteredTasks));
+      //add(LoadTasks());
     }
   }
+
+  void _applySearching(Emitter<TaskState> emit) {
+
+    List<Task> filteredTasks = List.from(_allTasks);
+
+    if (_currentQuery.isNotEmpty) {
+      filteredTasks = filteredTasks
+          .where((task) =>
+      task.title.toLowerCase().contains(_currentQuery.toLowerCase()) ||
+          task.description.toLowerCase().contains(_currentQuery.toLowerCase()))
+          .toList();
+    }
+
+  }
+
+
 }
+
+
 
 abstract class TaskEvent extends Equatable {
   const TaskEvent();
