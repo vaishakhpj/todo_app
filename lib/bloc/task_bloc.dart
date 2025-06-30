@@ -161,7 +161,7 @@ class AddTask extends TaskEvent {
   const AddTask(this.task);
 
   @override
-  List<Object> get props => [task];
+  List<Object> get props => [task.toString()];
 }
 
 class UpdateTask extends TaskEvent {
@@ -169,7 +169,7 @@ class UpdateTask extends TaskEvent {
   const UpdateTask(this.task);
 
   @override
-  List<Object> get props => [task];
+  List<Object> get props => [task.toString()];
 }
 
 class DeleteTask extends TaskEvent {
@@ -185,7 +185,7 @@ class ToggleTaskStatus extends TaskEvent {
   const ToggleTaskStatus(this.task);
 
   @override
-  List<Object> get props => [task];
+  List<Object> get props => [task.toString()];
 }
 
 class FilterTasks extends TaskEvent {
@@ -193,7 +193,7 @@ class FilterTasks extends TaskEvent {
   const FilterTasks(this.filter);
 
   @override
-  List<Object> get props => [filter];
+  List<Object> get props => [filter.toString()];
 }
 
 class SearchTasks extends TaskEvent {
@@ -209,7 +209,7 @@ class SortTasks extends TaskEvent {
   const SortTasks(this.sort);
 
   @override
-  List<Object> get props => [sort];
+  List<Object> get props => [sort.toString()];
 }
 
 // Enums for filtering and sorting
