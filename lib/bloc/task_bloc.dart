@@ -228,6 +228,8 @@ class TasksLoading extends TaskState {}
 class TasksLoaded extends TaskState {
   final List<Task> tasks;
   const TasksLoaded(this.tasks);
+  @override
+  List<Object> get props => [tasks.toString()];
 }
 class TasksError extends TaskState {
   final String message;
