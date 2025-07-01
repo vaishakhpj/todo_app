@@ -17,4 +17,5 @@ Add,edit,delete tasks
 Filtering tasks by All,pending,completed
 Sort by date, priority
 search tasks by title, description
+color code by priority
 
